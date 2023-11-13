@@ -1,0 +1,19 @@
+name: 'Carbon Aware Scheduler'
+description: 'Schedules a job to run when the carbon intensity is low'
+inputs:
+  region:
+    required: true
+    default: 'ukwest'
+  start-time:
+    description: 'Start time for job scheduling' 
+  end-time:
+    description: 'End time for job scheduling'
+  github-token:
+    description: 'GitHub token with write access to commit the scheduled job' 
+    required: true
+  templatePath:
+    description: 'Path to template of job to be scheduled'
+    required: true
+runs:
+  using: 'node20'
+  main: 'index.js'
