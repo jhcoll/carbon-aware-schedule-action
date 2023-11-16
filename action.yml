@@ -3,17 +3,27 @@ description: 'Schedules a job to run when the carbon intensity is low'
 inputs:
   region:
     required: true
-    default: 'ukwest'
-  start-time:
-    description: 'Start time for job scheduling' 
-  end-time:
-    description: 'End time for job scheduling'
-  github-token:
-    description: 'GitHub token with write access to commit the scheduled job' 
-    required: true
-  templatePath:
+    default: 'eastus'
+  template-paths:
     description: 'Path to template of job to be scheduled'
     required: true
+    default: ['templates/template.yml']
+  end-time:
+    description: 'End time for job scheduling'
+    default: ''
+  estimated-job-length:
+    description: 'Estimated length of job in minutes'
+    default: 10
+  output-path:
+    description: 'Path for output of scheduled jobs'
+    default: '.github/workflows/'
+
+outputs:
+  schedules-workflows:
+    description: 'Scheduled workflows'
+  scheduled-time:
+    description: 'Time that workflows have been scheduled to run'
+
 runs:
-  using: 'node20'
+  using: 'node18'
   main: 'src/index.js'
