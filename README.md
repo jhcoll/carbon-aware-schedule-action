@@ -52,3 +52,22 @@ jobs:
            git push
 ```
 A PAT will be required with workflow permissions to be able to create a new workflow, see the [docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
+
+## Template Example
+In order to schedule a workflow a template yaml file will need to be supplied. GitHub actions allow scheduling of jobs using CRON time, and this action will replace the string '$schedule$' with the cron time for the job to run.   
+
+```yaml
+name: Workflow to be scheduled
+
+on: 
+  schedule:
+    - cron: '$schedule$'
+
+jobs:
+  scheduled-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run a one-line script
+        run: echo Hello, world!
+```
