@@ -42,7 +42,7 @@ jobs:
             region: 'eastus'
             template-paths: 'templates/template.yml'
       - name: Commit scheduled workflow
-        run: | # A PAT will be required with workflow permissions to be able to create a new workflow, see the [Docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
+        run: |  
            git config --global user.name 'Your Name'
            git config --global user.email 'your-username@users.noreply.github.com'
            git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/$GITHUB_REPOSITORY
@@ -51,3 +51,4 @@ jobs:
            git commit -m "scheduled workflow"
            git push
 ```
+A PAT will be required with workflow permissions to be able to create a new workflow, see the [docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
