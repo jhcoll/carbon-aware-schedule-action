@@ -3,7 +3,7 @@ const fs = require("fs");
 
 const REGION = core.getInput('region') != '' ? core.getInput('region') : 'eastus';
 const REPO_DIRECTORY = process.env.GITHUB_WORKSPACE != undefined ? process.env.GITHUB_WORKSPACE : '.';
-const TEMPLATE_PATHS = core.getInput('template-paths') != '' ? core.getInput('template-paths') : [`templates/template.yml`];
+const TEMPLATE_PATHS = core.getInput('template-paths') != '' ? core.getInput('template-paths').replace(" ", "").split(",") : [`templates/template.yml`];
 const OUTPUT_PATH = core.getInput('output-path') != '' ? core.getInput('output-path') : [`.github/workflows/`];
 const JOB_LENGTH = core.getInput('estimated-job-length') != '' ? core.getInput('estimated-job-length') : 10;
 
@@ -15,6 +15,8 @@ const JOB_LENGTH = core.getInput('estimated-job-length') != '' ? core.getInput('
     if(endTime == '') {
       endTime = new Date()
       endTime.setDate(startTime.getDate() + 1);
+    } else {
+      endTime = new Date(endTime);
     }
 
     searchParams = new URLSearchParams({
@@ -26,14 +28,16 @@ const JOB_LENGTH = core.getInput('estimated-job-length') != '' ? core.getInput('
 
     core.debug('Search Params Used: ' + searchParams);
 
+    core.info("Getting schedule time with: https://carbon-aware-api.azurewebsites.net/emissions/forecasts/current?" + searchParams);
+
     data = await fetch("https://carbon-aware-api.azurewebsites.net/emissions/forecasts/current?" + searchParams,
     {
       method: "GET",
       headers: {"Content-Type": "application/json"},
     })
-    .then((res) => {
+    .then(async (res) => {
       if(res.status !== 200) {
-        console.log(res);
+          core.warning("Failed to get data: ", await res.text());
         throw Error(res.statusText);
       }
       return res.json()
@@ -64,17 +68,18 @@ const dateToCron = (date) => {
   return `${minutes} ${hours} ${days} ${months} ${dayOfWeek}`;
 };
 
-const writeSchedule = async (cron) => {
+const writeSchedule = (cron) => {
   updatedFiles = [];
   for (filePath of TEMPLATE_PATHS) {
     try{
       const filename = filePath.split('/').pop();
-      const data = await fs.readFileSync(`${REPO_DIRECTORY}/${filePath}`, 'utf8');
+      const data = fs.readFileSync(`${REPO_DIRECTORY}/${filePath}`, 'utf8');
       const result = data.replace(/\$schedule\$/g, cron);
-      await fs.writeFileSync(`${REPO_DIRECTORY}/${OUTPUT_PATH}/${filename}`, result, 'utf8');
+      fs.writeFileSync(`${REPO_DIRECTORY}/${OUTPUT_PATH}/${filename}`, result, 'utf8');
       updatedFiles.push(`${OUTPUT_PATH}/${filename}`);
     } catch(err) {
       core.warning(`Could not schedule ${filePath}`);
+      core.setFailed(err);
     }
   }
   return updatedFiles;

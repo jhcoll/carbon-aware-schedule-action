@@ -7,7 +7,7 @@ inputs:
   template-paths:
     description: 'Path to template of job to be scheduled'
     required: true
-    default: ['templates/template.yml']
+    default: 'templates/template.yml'
   end-time:
     description: 'End time for job scheduling'
     default: ''
@@ -25,5 +25,5 @@ outputs:
     description: 'Time that workflows have been scheduled to run'
 
 runs:
-  using: 'node18'
-  main: 'src/index.js'
+  using: 'node20'
+  main: 'dist/index.js'
